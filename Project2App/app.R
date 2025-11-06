@@ -1,5 +1,6 @@
 library(shiny)
 library(ggplot2)
+library(tidyverse)
 
 # Read in Seoul Bike Data
 bike_data <- read.csv("SeoulBikeData.csv", header = TRUE, fileEncoding = "latin1")
@@ -39,7 +40,18 @@ ui <- fluidPage(
 
         mainPanel(
           tabsetPanel(
-            tabPanel("About", h3("This is the About tab")),
+            tabPanel("About", 
+                     h1("About Seoul Bike Data Explorer"), 
+                     h3("Purpose of App"), 
+                     tags$p("the purpose of this app is to..."),
+                     tags$li("do this thing"),
+                     tags$li("do this thing"),
+                     h3("Data"), 
+                     p("this data is about..."),
+                     p("the data comes from link and pic"),
+                     img(src = "kagglelogo.png", height = "100px", width = "100px", alt = "A descriptive image alt text"),
+                     h3("Purpose of sidebar and tabs"), 
+                     p("these tabs do this...")),
             tabPanel("Data", h3("This is the Data tab")),
             tabPanel("Plots", h3("This is the Plots tab")))
         )

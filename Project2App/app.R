@@ -1,6 +1,7 @@
 library(shiny)
 library(ggplot2)
 library(tidyverse)
+library(DT)
 
 # Read in Seoul Bike Data
 bike_data <- read.csv("SeoulBikeData.csv", header = TRUE, fileEncoding = "latin1")
@@ -17,23 +18,15 @@ ui <- fluidPage(
     sidebarLayout(
       sidebarPanel(
         # Categorical Variables
-        selectInput("season", "Select Season",
-                    choices = unique(bike_data$Seasons),
-                    selected = unique(bike_data$Seasons),
-                    multiple = TRUE),
-        selectInput("holiday", "Select Holiday Type",
-                    choices = unique(bike_data$Holiday),
-                    selected = unique(bike_data$Holiday),
-                    multiple = TRUE),
-        # Numeric Variables
-        sliderInput("rainfall", "Select Rainfall (mm)",
-                    min = min(bike_data$Rainfall_mm),
-                    max = max(bike_data$Rainfall_mm),
-                    value = c(min(bike_data$Rainfall_mm), max(bike_data$Rainfall_mm))),
-        sliderInput("temperature", "Select Temperature (°C)",
-                    min = min(bike_data$Temperature_C),
-                    max = max(bike_data$Temperature_C),
-                    value = c(min(bike_data$Temperature_C), max(bike_data$Temperature_C))),
+        checkboxGroupInput("season", "Select Season(s)",
+                           choices = unique(bike_data$Seasons),
+                           selected = NULL),
+        checkboxGroupInput("holiday", "Select Holiday Type(s)",
+                           choices = unique(bike_data$Holiday),
+                           selected = NULL),
+        # Numeric variables
+        selectInput("numVar", "Choose a Numeric Variable:", choices = c("Temperature_C", "Rainfall_mm")),
+        uiOutput("numSlider"),
         # Action button
         actionButton("applyFilter", "Apply Filters", class = "btn-primary")
       ),
@@ -44,36 +37,70 @@ ui <- fluidPage(
                      img(src = "datasetcover.jpg", height = "100%", width = "100%"),
                      h1("About Seoul Bike Data Explorer"), 
                      h3("Purpose of App"), 
-                     tags$p("the purpose of this app is to..."),
-                     tags$li("do this thing"),
-                     tags$li("do this thing"),
+                     p("the purpose of this app is to..."),
+                     tags$ul(
+                       tags$li("do this thing"),
+                       tags$li("do this thing")
+                     ),
                      h3("Purpose of sidebar and tabs"), 
-                     tags$p("these tabs do this..."),
-                     tags$li("do this thing"),
-                     tags$li("do this thing")),
-                     h3("Data"),
+                     p("these tabs do this..."),
+                     tags$ul(
+                       tags$li("do this thing"),
+                       tags$li("do this thing")
+                     ),
+                     h3("Dataset"),
                      img(src = "kagglelogo.png", height = "25%", width = "25%"),
                      p("this data is about..."),
-                     tags$a(href="https://www.kaggle.com/datasets/saurabhshahane/seoul-bike-sharing-demand-prediction", "Click here for more information!"),
-            tabPanel("Data", h3("This is the Data tab")),
-            tabPanel("Plots", h3("This is the Plots tab")))
+                     tags$a(href="https://www.kaggle.com/datasets/saurabhshahane/seoul-bike-sharing-demand-prediction", "Click here for more information!")),
+            tabPanel("Data Download", 
+                     DT::dataTableOutput(
+                       DT::renderDataTable()
+                     )),
+            tabPanel("Data Exploration", h3("This is the Plots tab")))
         )
     )
 )
 
-# Define server logic required to draw a histogram
+
+# Server
 server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-    })
+  filtered_data <- reactiveVal(bike_data)
+  
+  # For categorical variables
+  observeEvent(input$applyFilter, {
+    df <- bike_data %>%
+      filter(
+        Seasons %in% input$season,
+        Holiday %in% input$holiday
+      )
+    
+    # Apply numeric variable filter if needed
+    var <- input$numVar
+    df <- df %>%
+      filter(
+        get(var) >= input$numRange[1],
+        get(var) <= input$numRange[2]
+      )
+    
+    filtered_data(df)
+  })
+  
+  # For numeric variables
+  output$numSlider <- renderUI({
+    var <- input$numVar
+    
+    if (var == "Temperature_C") {
+      sliderInput("numRange", "Select Temperature (°C):",
+                  min = min(bike_data$Temperature_C),
+                  max = max(bike_data$Temperature_C),
+                  value = c(min(bike_data$Temperature_C), max(bike_data$Temperature_C)))
+    } else if (var == "Rainfall_mm") {
+      sliderInput("numRange", "Select Rainfall (mm):",
+                  min = min(bike_data$Rainfall_mm),
+                  max = max(bike_data$Rainfall_mm),
+                  value = c(min(bike_data$Rainfall_mm), max(bike_data$Rainfall_mm)))
+    }
+  })
 }
 
 # Run the application 

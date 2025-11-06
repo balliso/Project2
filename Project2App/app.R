@@ -41,17 +41,20 @@ ui <- fluidPage(
         mainPanel(
           tabsetPanel(
             tabPanel("About", 
+                     img(src = "datasetcover.jpg", height = "100%", width = "100%"),
                      h1("About Seoul Bike Data Explorer"), 
                      h3("Purpose of App"), 
                      tags$p("the purpose of this app is to..."),
                      tags$li("do this thing"),
                      tags$li("do this thing"),
-                     h3("Data"), 
-                     p("this data is about..."),
-                     p("the data comes from link and pic"),
-                     img(src = "kagglelogo.png", height = "100px", width = "100px", alt = "A descriptive image alt text"),
                      h3("Purpose of sidebar and tabs"), 
-                     p("these tabs do this...")),
+                     tags$p("these tabs do this..."),
+                     tags$li("do this thing"),
+                     tags$li("do this thing")),
+                     h3("Data"),
+                     img(src = "kagglelogo.png", height = "25%", width = "25%"),
+                     p("this data is about..."),
+                     tags$a(href="https://www.kaggle.com/datasets/saurabhshahane/seoul-bike-sharing-demand-prediction", "Click here for more information!"),
             tabPanel("Data", h3("This is the Data tab")),
             tabPanel("Plots", h3("This is the Plots tab")))
         )

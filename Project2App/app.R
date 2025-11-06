@@ -1,12 +1,3 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
-
 library(shiny)
 library(ggplot2)
 
@@ -18,41 +9,39 @@ colnames(bike_data) <- (c("Date", "Rented_Bike_Count", "Hour", "Temperature_C", 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
-    # Application title
+    # App title
     titlePanel("Seoul Bike Data Explorer"),
 
     # Sidebar 
     sidebarLayout(
       sidebarPanel(
+        # Categorical Variables
         selectInput("season", "Select Season",
                     choices = unique(bike_data$Seasons),
                     selected = unique(bike_data$Seasons),
                     multiple = TRUE),
-        
         selectInput("holiday", "Select Holiday Type",
                     choices = unique(bike_data$Holiday),
                     selected = unique(bike_data$Holiday),
                     multiple = TRUE),
-        
-        selectInput("holiday", "Select Numeric Variable",
-                    choices = unique(bike_data$Holiday),
-                    selected = unique(bike_data$Holiday),
-                    multiple = TRUE),
-        
+        # Numeric Variables
         sliderInput("rainfall", "Select Rainfall (mm)",
                     min = min(bike_data$Rainfall_mm),
                     max = max(bike_data$Rainfall_mm),
                     value = c(min(bike_data$Rainfall_mm), max(bike_data$Rainfall_mm))),
-        
         sliderInput("temperature", "Select Temperature (°C)",
                     min = min(bike_data$Temperature_C),
                     max = max(bike_data$Temperature_C),
-                    value = c(min(bike_data$Temperature_C), max(bike_data$Temperature_C)))
+                    value = c(min(bike_data$Temperature_C), max(bike_data$Temperature_C))),
+        # Action button
+        actionButton("applyFilter", "Apply Filters", class = "btn-primary")
       ),
 
-        # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("distPlot")
+          tabsetPanel(
+            tabPanel("About", h3("This is the About tab")),
+            tabPanel("Data", h3("This is the Data tab")),
+            tabPanel("Plots", h3("This is the Plots tab")))
         )
     )
 )

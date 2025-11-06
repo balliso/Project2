@@ -52,10 +52,12 @@ ui <- fluidPage(
                      img(src = "kagglelogo.png", height = "25%", width = "25%"),
                      p("this data is about..."),
                      tags$a(href="https://www.kaggle.com/datasets/saurabhshahane/seoul-bike-sharing-demand-prediction", "Click here for more information!")),
-            tabPanel("Data Download", 
-                     DT::dataTableOutput(
-                       DT::renderDataTable()
-                     )),
+            tabPanel("Data Table", 
+                     downloadButton(outputId = "downloadData", 
+                                    label = "Click here to download table!", 
+                                    class = NULL),
+                     DT::dataTableOutput("filteredTable"))
+            ,
             tabPanel("Data Exploration", h3("This is the Plots tab")))
         )
     )
@@ -64,28 +66,33 @@ ui <- fluidPage(
 
 # Server
 server <- function(input, output) {
+  # Store filtered data
   filtered_data <- reactiveVal(bike_data)
   
   # For categorical variables
   observeEvent(input$applyFilter, {
-    df <- bike_data %>%
-      filter(
-        Seasons %in% input$season,
-        Holiday %in% input$holiday
-      )
-    
-    # Apply numeric variable filter if needed
+    df <- bike_data
+    # Filter categorical variables
+    if (!is.null(input$season) && length(input$season) > 0) {
+      df <- df |> 
+        filter(Seasons %in% input$season)
+    }
+    if (!is.null(input$holiday) && length(input$holiday) > 0) {
+      df <- df |> 
+        filter(Holiday %in% input$holiday)
+    }
+    # Filter numeric variables
     var <- input$numVar
-    df <- df %>%
+    df <- df |>
       filter(
         get(var) >= input$numRange[1],
         get(var) <= input$numRange[2]
       )
-    
-    filtered_data(df)
+  # Update dataset
+  filtered_data(df)
   })
   
-  # For numeric variables
+  # Numeric variable slider
   output$numSlider <- renderUI({
     var <- input$numVar
     
@@ -101,6 +108,18 @@ server <- function(input, output) {
                   value = c(min(bike_data$Rainfall_mm), max(bike_data$Rainfall_mm)))
     }
   })
+  output$filteredTable <- DT::renderDataTable({
+    filtered_data()
+  })
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste0("bikedatatable_", Sys.Date(), ".csv")
+    },
+    content = function(file) {
+      data_to_download <- filtered_data()
+      write.csv(data_to_download, file, row.names = FALSE)
+    }
+  )
 }
 
 # Run the application 

@@ -35,8 +35,8 @@ ui <- fluidPage(
           tabsetPanel(
             tabPanel("About", 
                      img(src = "seoulbike3.png", height = "100%", width = "100%"),
-                     h1("About Seoul Bike Sharing Data Explorer"), 
-                     h2("Purpose of this App"), 
+                     h1("About: Seoul Bike Sharing Data Explorer"), 
+                     h2("Purpose of this app"), 
                      p("The purpose of this app is to view data from the Seoul Bike Sharing datasheet, to discover relationships in the data. "),
                      br(),
                      p("The tabs along the top of the app can be clicked, showing the following:"),

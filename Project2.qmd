@@ -56,7 +56,7 @@ ggplot(bike_data, aes(x = Seasons, y = Rented_Bike_Count, fill = Functioning_Day
 # Line plot (multivariate plot 4) - This plot shows hourly rental trends by season
 ggplot(bike_data, aes(x = Hour, y = Rented_Bike_Count, color = Seasons)) + geom_line() + labs(x = "Hour Rented", y = "Rented Bike Count", title = "Lineplot of Hour Rented vs Rented Bike Count by Seasons")
 
-# Histogram (multivariate plot 5 + faceting) - This plot shows the distribution of temperature per season.
+# Histogram/density plot (multivariate plot 5 + faceting) - This plot shows the distribution of temperature per season.
 ggplot(bike_data, aes(x = Temperature_C)) + geom_density(fill = "salmon", alpha = 0.7) + labs(x = "Temperate C", y = "Density", title = "Histogram of Temperature per Season") + facet_wrap(~ Seasons)
 
 # Heatmap (multivariate plot 6 + not covered in class) - This plot shows when rentals peak throughout the day by season

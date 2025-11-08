@@ -36,39 +36,66 @@ ui <- fluidPage(
             tabPanel("About", 
                      img(src = "seoulbike3.png", height = "100%", width = "100%"),
                      h1("About: Seoul Bike Sharing Data Explorer"), 
-                     h2("Purpose of this app"), 
-                     p("The purpose of this app is to view data from the Seoul Bike Sharing datasheet, to discover relationships in the data. "),
-                     br(),
-                     p("The tabs along the top of the app can be clicked, showing the following:"),
+                     h2("Purpose of the App"), 
+                     p("The Seoul Bike Sharing Data Explorer is a tool to help users explore patterns in bike rentals across different weather and seasonal conditions. By selecting specific criteria in the sidebar, you can observe how seasons, holidays, temperature, and rainfall influence bike rentals in Seoul."),
+                     h2("How to Use This App"),
+                     p("Use the sidebar on the left to select numeric and categorical variables to filter the dataset. A user can:"),
                      tags$ul(
-                       tags$li("The 'About' section describes the app and how to use it, and gives some background on the dataset."),
-                       tags$li("The 'Data Download' section allows the user to view parts of the datasheet based on inputs from the sidebar, and download them to a computer. "),
-                       tags$li("The 'Data Exploration' tab allows the user to obtain numeric and graphical summaries from the data, based on inputs on the sidebar.")
-                     ),
-                     br(),
-                     p("The sidebar along the lefthand edge of the app is where a user can select numeric and categorical variables to view in the dataset. A user can:"),
-                     tags$ul(
-                       tags$li("Select up to four different seasons to view data from."),
-                       tags$li("Select to view data from holidays vs nonholidays."),
-                       tags$li("Choose to view one of two numeric variables: temperature or rainfall."),
-                       tags$li("Use the slider to determine a range of temperature or rainfall to view."),
+                       tags$li("Select up to four different seasons."),
+                       tags$li("Choose to view data from holidays, nonholidays, or both."),
+                       tags$li("Select one of two numeric variables, temperature or rainfall, and use the slider to adjust its range."),
+                       tags$li("Click 'Apply Filters' to update the data and plots.")),
                        br(),
-                       img(src = "seoulbike2.png", height = "100%", width = "100%")),
-                     h2("About the data"),
-                     p("The Seoul Bike Sharing dataset contains counts of public bicycles rented per hour in the Seoul Bike Sharing System. Corresponding weather and holiday information was also recorded. The dataset can be used to predict how atmospheric conditions affect the number of bikes rented."),
-                     p("Please click the link below for more information."),
+                     p("The app is organized into tabs across the top, showing the following:"),
+                     tags$ul(
+                       tags$li("The 'About' tab (this page) describes the app and how to use it, and gives some background on the dataset."),
+                       tags$li("The 'Data Download' tab displays a filtered version of the dataset, which you can download to your computer."),
+                       tags$li("The 'Data Exploration' tab provides summary statistics and visualizations to help identify trends and relationships in the data.")),
                      br(),
+                       img(src = "seoulbike2.png", height = "100%", width = "100%"),
+                     h2("About the Dataset"),
+                     p("The data used in this app, the Seoul Bike Sharing dataset, contains counts of public bicycles rented per hour from the Seoul Bike Sharing System, along with corresponding weather and holiday information. It can be used to understand how atmospheric conditions affect the number of bikes rented, and make predictions for future bike rentals."),
+                     br(),
+                     p("The original dataset is available on Kaggle. Please click the link below for more information."),
                      tags$a(href="https://www.kaggle.com/datasets/saurabhshahane/seoul-bike-sharing-demand-prediction", "Click here for more information!"),
                      br(), br(), br(),
                      img(src = "seoulbike.jpeg", height = "100%", width = "100%")),
-            tabPanel("Data Table", br(), br(),
+            tabPanel("Data Download", 
+                     h3("See Table and Download Below"),
+                     br(),
                      downloadButton(outputId = "downloadData", 
                                     label = "Click here to download table!", 
                                     class = NULL),
                      br(), br(), br(),
-                     DT::dataTableOutput("filteredTable"))
-            ,
-            tabPanel("Data Exploration", h3("This is the plots tab")))
+                     DT::dataTableOutput("filteredTable")),
+            tabPanel("Data Exploration",
+                     h3("Explore the Subsetted Data"),
+                     selectInput("summaryType", "Choose a summary type:",
+                                 choices = c("Categorical Summaries", "Numeric Summaries", "Graphs")),
+                     conditionalPanel(
+                       condition = "input.summaryType == 'Categorical Summaries'",
+                       selectInput("catVar1", "Choose a categorical variable:",
+                                   choices = c("Holiday", "Functioning_Day", "Seasons")),
+                       selectInput("catVar2", "Choose a second categorical variable (optional):",
+                                   choices = c("None", "Holiday", "Functioning_Day", "Seasons"), selected = "None")
+                     ),
+                     conditionalPanel(
+                       condition = "input.summaryType == 'Numeric Summaries'",
+                       selectInput("numSummaryVar", "Choose a numeric variable:",
+                                   choices = c("Temperature_C", "Humidity_%", "Wind_speed_m/s",
+                                               "Visibility_10m", "Dew_point_temp_C", "Solar_Radiation_MJ/m2",
+                                               "Rainfall_mm", "Snowfall_cm", "Rented_Bike_Count"))
+                     ),
+                     conditionalPanel(
+                       condition = "input.summaryType == 'Graphs'",
+                       selectInput("plotType", "Choose a plot type:",
+                                   choices = c("Bar Plot", "Scatterplot", "Boxplot", "Line Plot", "Density Plot", "Heatmap"))
+                     ),
+                     br(),
+                     verbatimTextOutput("summaryOutput"),
+                     plotOutput("explorePlot"))
+            
+            )
         )
     )
 )
@@ -78,6 +105,8 @@ ui <- fluidPage(
 server <- function(input, output) {
   # Store filtered data
   filtered_data <- reactiveVal(bike_data)
+  
+  # Sidebar 
   
   # For categorical variables
   observeEvent(input$applyFilter, {
@@ -98,7 +127,6 @@ server <- function(input, output) {
         get(var) >= input$numRange[1],
         get(var) <= input$numRange[2]
       )
-  # Update dataset
   filtered_data(df)
   })
   
@@ -118,6 +146,8 @@ server <- function(input, output) {
                   value = c(min(bike_data$Rainfall_mm), max(bike_data$Rainfall_mm)))
     }
   })
+  
+  # Data Download Tab
   output$filteredTable <- DT::renderDataTable({
     filtered_data()
   })
@@ -128,9 +158,63 @@ server <- function(input, output) {
     content = function(file) {
       data_to_download <- filtered_data()
       write.csv(data_to_download, file, row.names = FALSE)
+    })
+  
+  # Data Exploration Tab
+  output$explorePlot <- renderPlot({
+    df <- filtered_data()
+    req(nrow(df) > 0)
+    
+    if (input$summaryType == "Categorical Summaries") {
+      var1 <- input$catVar1
+      var2 <- input$catVar2
+      
+      if (var2 == "None") {
+        return(table(df[[var1]], useNA = "always"))
+      } else {
+        return(table(df[[var1]], df[[var2]], useNA = "always"))
+      }
+      
+    } else if (input$summaryType == "Numeric Summaries") {
+      var <- input$numSummaryVar
+      summary_stats <- df |>
+        summarize(Mean = mean(.data[[var]], na.rm = TRUE),
+                  Median = median(.data[[var]], na.rm = TRUE),
+                  SD = sd(.data[[var]], na.rm = TRUE),
+                  IQR = IQR(.data[[var]], na.rm = TRUE))
+      print(summary_stats)
     }
-  )
+    # Plots
+    if (input$plotType == "Bar Plot") {
+      ggplot(df, aes(x = Holiday)) + geom_bar(fill = "darkseagreen") +
+        labs(x = "Holiday", y = "Count", title = "Bar Plot of Holiday vs No Holiday Bike Rentals")
+    } else if (input$plotType == "Scatterplot") {
+      ggplot(df, aes(x = Temperature_C, y = Rented_Bike_Count, color = Seasons)) +
+        geom_point() +
+        labs(x = "Temperature (°C)", y = "Rented Bike Count",
+             title = "Scatterplot of Temperature vs Rented Bike Count by Season")
+    } else if (input$plotType == "Boxplot") {
+      ggplot(df, aes(x = Seasons, y = Rented_Bike_Count, fill = Functioning_Day)) +
+        geom_boxplot() +
+        labs(x = "Season", y = "Rented Bike Count", title = "Rented Bike Count by Season and Functioning Day")
+    } else if (input$plotType == "Line Plot") {
+      ggplot(df, aes(x = Hour, y = Rented_Bike_Count, color = Seasons)) +
+        geom_line() +
+        labs(x = "Hour", y = "Rented Bike Count", title = "Hourly Rental Trends by Season")
+    } else if (input$plotType == "Density Plot") {
+      ggplot(df, aes(x = Temperature_C)) +
+        geom_density(fill = "salmon", alpha = 0.7) +
+        facet_wrap(~ Seasons) +
+        labs(x = "Temperature (°C)", y = "Density", title = "Temperature Distribution per Season")
+    } else if (input$plotType == "Heatmap") {
+      ggplot(df, aes(x = Hour, y = Seasons, fill = Rented_Bike_Count)) +
+        geom_tile(color = "white") +
+        scale_fill_gradient(low = "yellow", high = "red") +
+        labs(x = "Hour of Rental", y = "Season", fill = "Mean Rented Bike",
+             title = "Heatmap of Hour vs Season by Mean Rented Bike Count")
+    }
+  })
+  
 }
-
 # Run the application 
 shinyApp(ui = ui, server = server)

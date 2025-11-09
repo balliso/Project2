@@ -20,7 +20,7 @@ bike_data
 
 ```{r}
 # One way contingency tables
-table(bike_data$Holiday, useNA = "always")
+table(bike_data$Holiday)
 table(bike_data$Functioning_Day)
 
 # Two way contingency tables
@@ -60,5 +60,5 @@ ggplot(bike_data, aes(x = Hour, y = Rented_Bike_Count, color = Seasons)) + geom_
 ggplot(bike_data, aes(x = Temperature_C)) + geom_density(fill = "salmon", alpha = 0.7) + labs(x = "Temperate C", y = "Density", title = "Histogram of Temperature per Season") + facet_wrap(~ Seasons)
 
 # Heatmap (multivariate plot 6 + not covered in class) - This plot shows when rentals peak throughout the day by season
-ggplot(bike_data, aes(x = Hour, y = Seasons, fill = Rented_Bike_Count)) + geom_tile(color = "white") + scale_fill_gradient(low = "yellow", high = "red") + labs(x = "Hour of Rental", y = "Season", fill = "Mean Rented Bike", title = "Heatmap of Hour vs Season by Mean Rented Bike Count")
+ggplot(bike_data, aes(x = Hour, y = Seasons, fill = Rented_Bike_Count)) + geom_tile(color = "white") + scale_fill_gradient(low = "yellow", high = "red") + labs(x = "Hour of Rental", y = "Season", fill = "Rented Bike Count", title = "Heatmap of Hour vs Season by Rented Bike Count")
 ```

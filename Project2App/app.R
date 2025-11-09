@@ -2,6 +2,8 @@ library(shiny)
 library(ggplot2)
 library(tidyverse)
 library(DT)
+library(shinycssloaders)
+
 
 # Read in Seoul Bike Data
 bike_data <- read.csv("SeoulBikeData.csv", header = TRUE, fileEncoding = "latin1")
@@ -29,6 +31,7 @@ ui <- fluidPage(
         uiOutput("numSlider"),
         # Action button
         actionButton("applyFilter", "Apply Filters", class = "btn-primary")),
+      
     # Main Panel
         mainPanel(
           tabsetPanel(
@@ -106,7 +109,7 @@ ui <- fluidPage(
                        condition = "input.summaryType == 'Graphs'",
                        selectInput("plotType", "Choose a plot type:",
                                    choices = c("Bar Plot","Scatterplot","Boxplot","Line Plot","Density Plot","Heatmap")),
-                       plotOutput("explorePlot")))
+                       withSpinner(plotOutput("explorePlot"))))
             )
         )
     )
@@ -114,7 +117,7 @@ ui <- fluidPage(
 
 
 # Server
-server <- function(input, output) {
+server <- function(input, output, session) {
   # Store filtered data
   filtered_data <- reactiveVal(bike_data)
   

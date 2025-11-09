@@ -5,6 +5,6 @@ account: balliso
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16008462
-bundleId: 11151464
+bundleId: 11151467
 url: https://balliso.shinyapps.io/project2app/
 version: 1

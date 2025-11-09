@@ -234,19 +234,21 @@ server <- function(input, output) {
       ggplot(df, aes(x = Temperature_C, y = Rented_Bike_Count, color = Seasons)) +
         geom_point() +
         labs(x = "Temperature (°C)", y = "Rented Bike Count",
-             title = "Scatterplot of Temperature vs Rented Bike Count by Season")
+             title = "Scatterplot of Temperature vs Rented Bike Count by Season") +
+        scale_color_manual(values = c("Winter" = "cadetblue1", "Spring" = "lightpink", "Summer" = "cornflowerblue", "Autumn" = "darkolivegreen"))
       
     } else if (input$plotType == "Boxplot") {
       ggplot(df, aes(x = Seasons, y = Rented_Bike_Count, fill = Functioning_Day)) +
         geom_boxplot() +
         labs(x = "Season", y = "Rented Bike Count",
-             title = "Rented Bike Count by Season and Functioning Day")
+             title = "Boxplot of Rented Bike Count by Season and Functioning Day") +
+        scale_fill_manual(values = c("No" = "darkgoldenrod", "Yes" = "darkslategray3"))
       
     } else if (input$plotType == "Line Plot") {
       ggplot(df, aes(x = Hour, y = Rented_Bike_Count, color = Seasons)) +
         geom_line() +
-        labs(x = "Hour", y = "Rented Bike Count",
-             title = "Hourly Rental Trends by Season")
+        labs(x = "Hour Rented", y = "Rented Bike Count",
+             title = "Lineplot of Hour Rented vs Rented Bike Count by Seasons")
       
     } else if (input$plotType == "Density Plot") {
       ggplot(df, aes(x = Temperature_C)) +

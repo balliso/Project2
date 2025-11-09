@@ -48,7 +48,7 @@ bike_data |>
 ggplot(bike_data, aes(x = Holiday)) + geom_bar(fill = "darkseagreen") + labs(x = "Holiday", y = "Count", title = "Bar Plot of Holiday vs No Holiday Bike Rentals")
 
 # Scatterplot (multivariate plot 2) - This plot shows the relationship between temperature and bike rentals, indicating seasonal trends. 
-ggplot(bike_data, aes(x = Temperature_C, y = Rented_Bike_Count, color = Seasons)) + geom_point() + labs(x = "Temperature C", y = "Rented Bike Count", title = "Scatterplot of Temperature vs Rented Bike Count by Season") + scale_color_manual(values = c("Winter" = "cadetblue1", "Spring" = "lightpink", "Summer" = "cornflowerblue", "Autumn" = "darkolivegreen"))
+ggplot(bike_data, aes(x = Temperature_C, y = Rented_Bike_Count, color = Seasons)) + geom_point() + labs(x = "Temperature (°C)", y = "Rented Bike Count", title = "Scatterplot of Temperature vs Rented Bike Count by Season") + scale_color_manual(values = c("Winter" = "cadetblue1", "Spring" = "lightpink", "Summer" = "cornflowerblue", "Autumn" = "darkolivegreen"))
 
 # Boxplot (multivariate plot 3) - This plot shows the distribution of rentals across seasons and days.
 ggplot(bike_data, aes(x = Seasons, y = Rented_Bike_Count, fill = Functioning_Day)) + geom_boxplot() + labs(x = "Seasons", y = "Rented Bike Count", title = "Boxplot of Seasons vs Rented Bike Count by Functioning Day") + scale_fill_manual(values = c("No" = "darkgoldenrod", "Yes" = "darkslategray3"))
@@ -57,7 +57,7 @@ ggplot(bike_data, aes(x = Seasons, y = Rented_Bike_Count, fill = Functioning_Day
 ggplot(bike_data, aes(x = Hour, y = Rented_Bike_Count, color = Seasons)) + geom_line() + labs(x = "Hour Rented", y = "Rented Bike Count", title = "Lineplot of Hour Rented vs Rented Bike Count by Seasons")
 
 # Histogram/density plot (multivariate plot 5 + faceting) - This plot shows the distribution of temperature per season.
-ggplot(bike_data, aes(x = Temperature_C)) + geom_density(fill = "salmon", alpha = 0.7) + labs(x = "Temperate C", y = "Density", title = "Histogram of Temperature per Season") + facet_wrap(~ Seasons)
+ggplot(bike_data, aes(x = Temperature_C)) + geom_density(fill = "salmon", alpha = 0.7) + labs(x = "Temperate (°C)", y = "Density", title = "Temperature Distribution per Season") + facet_wrap(~ Seasons)
 
 # Heatmap (multivariate plot 6 + not covered in class) - This plot shows when rentals peak throughout the day by season
 ggplot(bike_data, aes(x = Hour, y = Seasons, fill = Rented_Bike_Count)) + geom_tile(color = "white") + scale_fill_gradient(low = "yellow", high = "red") + labs(x = "Hour of Rental", y = "Season", fill = "Rented Bike Count", title = "Heatmap of Hour vs Season by Rented Bike Count")

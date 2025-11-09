@@ -13,7 +13,6 @@ bike_data <- read.csv("SeoulBikeData.csv", header = TRUE, fileEncoding = "latin1
 # Tidy up column names
 colnames(bike_data) <- (c("Date", "Rented_Bike_Count", "Hour", "Temperature_C", "Humidity_%", "Wind_speed_m/s", "Visibility_10m", "Dew_point_temp_C", "Solar_Radiation_MJ/m2", "Rainfall_mm", "Snowfall_cm", "Seasons", "Holiday", "Functioning_Day"))
 
-bike_data
 ```
 
 # Investigating the data
